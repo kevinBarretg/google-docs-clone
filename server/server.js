@@ -6,9 +6,18 @@ const io = require('socket.io')(3001, {
 })
 
 io.on("connection", socket => {
-    socket.on("send-changes", delta => {
-        socket.broadcast.emit("receive-changes", delta)
-        console.log(delta)
+    socket.on('get-document', documentId => {
+        
+        // load document
+        const data = ""
+        socket.join(documentId)
+        socket.emit("load-document", data)
+
+        // detect changes
+        socket.on("send-changes", delta => {
+            socket.broadcast.to(documentId).emit("receive-changes", delta)
+            console.log(delta)
+        })
     })
     console.log('connected')
 })
